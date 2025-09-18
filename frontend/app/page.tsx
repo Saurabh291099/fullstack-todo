@@ -1,8 +1,14 @@
+"use client";
+
+import SignUp from "./templates/SignUp";
 
 export default function Home() {
+  const onSubmit = () => {
+    alert("SignUp Form Submit");
+  };
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <h1>Hello Todo</h1>
+    <div className="w-full h-full">
+      <SignUp onSubmit={onSubmit} />
     </div>
   );
 }
