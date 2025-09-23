@@ -9,7 +9,7 @@ import {
   Matches
 } from 'class-validator';
 
-export class CreateUserDto {
+export class SignupDto {
   @IsString()
   @MinLength(2)
   @MaxLength(100)

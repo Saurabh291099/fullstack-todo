@@ -7,9 +7,9 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-@Entity('users')
+@Entity('auth')
 @Unique(['email'])
-export class User {
+export class SignUp {
   // @PrimaryGeneratedColumn('uuid')
   @PrimaryGeneratedColumn()
   id: string;
@@ -20,7 +20,7 @@ export class User {
   @Column({ length: 15, nullable: true })
   phoneNumber: string;
 
-  @Column({ unique: true})
+  @Column({ unique: true })
   email: string;
 
   @Column()
@@ -28,6 +28,9 @@ export class User {
 
   @Column()
   gender: string;
+
+  @Column({ nullable: true })
+  refreshToken?: string;
 
   @CreateDateColumn()
   createdAt: Date;
