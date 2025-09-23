@@ -1,119 +1,70 @@
 "use client";
-
-import { useState } from "react";
-import { useForm, SubmitHandler } from "react-hook-form";
 import Input from "../components/Input";
 import Button from "../components/Button";
+import { UseFormRegister } from "react-hook-form";
+export interface TodoType {
+  id: number;
+  name: string;
+  description?: string;
+  time: string;
+  completed: boolean;
+}
 
-interface TodoItem {
+interface TodoFormData {
   id: number;
   name: string;
   description: string;
-  completed: boolean;
   time: string;
+  completed: boolean;
 }
 
-const TODOS_PER_PAGE = 5;
+interface TodoItem {
+  handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+  register: UseFormRegister<TodoFormData>;
+  todos: TodoFormData[];
+  errorMessage?: string;
+  editingId: number | null;
+  currentTodos: TodoFormData[];
+  toggleComplete: (id: number) => void;
+  editTodo: (todo: TodoFormData) => void;
+  deleteTodo: (id: number) => void;
+  totalPages: number;
+  currentPage: number;
+  goToPage: (page: number) => void;
+}
 
-const Todo: React.FC = () => {
-  const [todos, setTodos] = useState<TodoItem[]>([]);
-  const [editingId, setEditingId] = useState<number | null>(null);
-  const [currentPage, setCurrentPage] = useState<number>(1);
-
-  const {
-    register,
-    handleSubmit,
-    reset,
-    setValue,
-    formState: { errors },
-  } = useForm<{
-    name: string;
-    description?: string;
-    time: string;
-    completed: boolean;
-  }>();
-
-  // Add or update todo
-  const onSubmit: SubmitHandler<{
-    name: string;
-    description?: string;
-    time: string;
-    completed: boolean;
-  }> = (data) => {
-    if (editingId !== null) {
-      setTodos(
-        todos.map((todo) =>
-          todo.id === editingId
-            ? {
-                ...todo,
-                name: data.name,
-                description: data.description || "",
-                time: data.time,
-                completed: data.completed,
-              }
-            : todo
-        )
-      );
-      setEditingId(null);
-    } else {
-      const todo: TodoItem = {
-        id: Date.now(),
-        name: data.name,
-        description: data.description || "",
-        completed: data.completed,
-        time: data.time,
-      };
-      setTodos([todo, ...todos]);
-    }
-
-    reset();
-    setCurrentPage(1); // Reset to first page after adding/updating
-  };
-
-  const toggleComplete = (id: number) => {
-    setTodos(
-      todos.map((todo) =>
-        todo.id === id ? { ...todo, completed: !todo.completed } : todo
-      )
-    );
-  };
-
-  const deleteTodo = (id: number) => {
-    setTodos(todos.filter((todo) => todo.id !== id));
-    if (editingId === id) setEditingId(null);
-    // Adjust page if last item is deleted
-    const lastPage = Math.ceil((todos.length - 1) / TODOS_PER_PAGE);
-    if (currentPage > lastPage) setCurrentPage(lastPage);
-  };
-
-  const editTodo = (todo: TodoItem) => {
-    setEditingId(todo.id);
-    setValue("name", todo.name);
-    setValue("description", todo.description);
-    setValue("time", todo.time);
-    setValue("completed", todo.completed);
-  };
-
-  // Pagination logic
-  const totalPages = Math.ceil(todos.length / TODOS_PER_PAGE);
-  const startIndex = (currentPage - 1) * TODOS_PER_PAGE;
-  const currentTodos = todos.slice(startIndex, startIndex + TODOS_PER_PAGE);
-
-  const goToPage = (page: number) => {
-    if (page < 1 || page > totalPages) return;
-    setCurrentPage(page);
-  };
-
+const Todo: React.FC<TodoItem> = ({
+  handleSubmit,
+  todos,
+  register,
+  errorMessage,
+  editingId,
+  currentTodos,
+  toggleComplete,
+  editTodo,
+  deleteTodo,
+  totalPages,
+  currentPage,
+  goToPage,
+}) => {
   return (
     <div className="border bg-gray-100 flex flex-col items-center p-10 rounded-xl">
-      <div className={`${todos.length === 1 ? "flex justify-between items-center" : ""}`}>
+      <div
+        className={`${
+          todos.length === 1 ? "flex justify-between items-center" : ""
+        }`}
+      >
         <h1 className="text-3xl font-bold mb-4">Todo App</h1>
-        {todos.length === 1 ? <Button type="button" label="Add New Todo" /> : ""}
+        {todos.length === 1 ? (
+          <Button type="button" label="Add New Todo" />
+        ) : (
+          ""
+        )}
       </div>
 
       {/* Todo Input Form */}
       <form
-        onSubmit={handleSubmit(onSubmit)}
+        onSubmit={handleSubmit}
         className="flex flex-col w-full gap-2 max-w-md mb-4"
       >
         <Input
@@ -121,7 +72,8 @@ const Todo: React.FC = () => {
           label="Name"
           type="text"
           {...register("name", { required: "Name is required" })}
-          errorMessage={errors.name?.message}
+          errorMessage={errorMessage}
+          // errorMessage={errors.name?.message}
           className="w-full"
         />
 
@@ -138,7 +90,7 @@ const Todo: React.FC = () => {
           label="Time"
           type="datetime-local"
           {...register("time", { required: "Time is required" })}
-          errorMessage={errors.time?.message}
+          errorMessage={errorMessage}
           className="w-full"
         />
 

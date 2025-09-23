@@ -4,29 +4,23 @@ import { ValidationPipe } from '@nestjs/common';
 import 'winston-daily-rotate-file';
 
 async function bootstrap() {
-  // const app = await NestFactory.create(AppModule);
-  // await app.listen(process.env.PORT ?? 3002);
+  const app = await NestFactory.create(AppModule, {
+    logger: ['error', 'warn', 'log'],
+  });
 
-  const app = await NestFactory.create(AppModule, { logger: ['error', 'warn', 'log'] });
+  // Enable CORS for frontend at localhost:3000
+  app.enableCors({
+    origin: 'http://localhost:3000', // frontend URL
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    credentials: true,
+  });
+
+  // Global validation
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
-  await app.listen(process.env.PORT ?? 3000);
-  console.log(
-    `🚀 Server running on http://localhost:${process.env.PORT ?? 3000}`,
-  );
-
-  // const logger = WinstonModule.createLogger({
-  //   transports: [
-  //     new winston.transports.Console(),
-  //     new (winston.transports.DailyRotateFile)({
-  //       filename: 'logs/application-%DATE%.log',
-  //       datePattern: 'YYYY-MM-DD',
-  //       maxFiles: '14d',
-  //     }),
-  //   ],
-  // });
-
-  // const app = await NestFactory.create(AppModule, { logger });
-  // app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
-  // await app.listen(3000);
+  // backend port
+  const port = process.env.PORT ?? 4000;
+  await app.listen(port);
+  console.log(`🚀 Backend running on http://localhost:${port}`);
 }
+
 void bootstrap();
