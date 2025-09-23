@@ -37,7 +37,7 @@ const Label: React.FC<LabelProps> = ({
         textColor,
         className,
         fontWeight,
-        "font-gabarito text-white capitalize",
+        "font-gabarito text-black capitalize",
         LabelStyle[variant],
         { "opacity-60 pointer-events-none": disabled }
       )}

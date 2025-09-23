@@ -54,7 +54,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
       <div className={`relative inline-flex flex-col ${classNameForContainer}`}>
         {label && (
           <Label id={`${id}-label`} labelFor={id} variant={variant}>
-            {label} {required && <span className="text-error-100">*</span>}
+            {label} {required && <span className="text-red-500">*</span>}
           </Label>
         )}
         <input
@@ -77,7 +77,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             focus:outline-none
             ${
               errorMessage
-                ? "border-error-100"
+                ? "border-red-500"
                 : "border-neutral-300 hover:border-neutral-600 focus:border-primary-900"
             }
             ${
@@ -89,7 +89,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           `}
         />
         {errorMessage && (
-          <span className="text-error-100 text-sm mt-2 block">
+          <span className="text-red-500 text-sm mt-2 block">
             {errorMessage}
           </span>
         )}

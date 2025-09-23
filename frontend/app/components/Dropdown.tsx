@@ -23,8 +23,8 @@ const DropdownButton: React.FC<DropdownProps> = ({
 
   const selectedItem = items?.find((item) => item?.key === value);
   return (
-    <Dropdown menu={{ items, onClick: handleMenuClick }}>
-      <Button className="!justify-between">
+    <Dropdown menu={{ items, onClick: handleMenuClick }} className="w-full !h-11">
+      <Button className="!justify-between w-full">
         {selectedItem?.key || placeholder}
         <DownOutlined />
       </Button>

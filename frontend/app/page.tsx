@@ -1,14 +1,16 @@
 "use client";
 
-import SignUp from "./templates/SignUp";
+// import LoginPage from "./login/page";
+// import SignUpPage from "./signup/page";
+import TodoPage from "./todo/page";
 
 export default function Home() {
-  const onSubmit = () => {
-    alert("SignUp Form Submit");
-  };
+  
   return (
-    <div className="w-full h-full">
-      <SignUp onSubmit={onSubmit} />
+    <div className="w-full ">
+      {/* <SignUpPage /> */}
+      {/* <LoginPage/> */}
+      <TodoPage/>
     </div>
   );
 }

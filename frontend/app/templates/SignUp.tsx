@@ -55,99 +55,116 @@ const SignUp: React.FC<SignupProps> = ({}) => {
   // };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <div className="grid place-content-center gap-4 min-h-[100vh] max-h-[100vh]">
-        <Input
-          id="name"
-          label="Name"
-          type="text"
-          {...register("name", { required: "Name is Required." })}
-          errorMessage={errors.name?.message}
-        />
-        <Input
-          id="phoneNumber"
-          label="Phone Number"
-          type="text"
-          {...register("phoneNumber", { required: "Phone Number is Required" })}
-          errorMessage={errors.phoneNumber?.message}
-        />
-        <div className="grid gap-2">
-          <Label id="" labelFor="">
-            Gender
-          </Label>
+    <div className=" grid place-content-center p-8 rounded-xl gap-2 bg-white shadow-2xl ">
+      <h1 className="text-center text-3xl font-bold">Sign Up</h1>
 
-          <Controller
-            name="gender"
-            control={control}
-            rules={{ required: "Gender is Required." }}
-            render={({ field }) => (
-              <DropdownButton
-                items={genderItems}
-                value={field.value}
-                onChange={field.onChange}
-                placeholder="Select Gender"
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <div className="grid place-content-center gap-2 w-[25rem]">
+          <Input
+            id="name"
+            label="Name"
+            type="text"
+            {...register("name", { required: "Name is Required." })}
+            errorMessage={errors.name?.message}
+            className="w-[20rem]"
+          />
+          <Input
+            id="phoneNumber"
+            label="Phone Number"
+            type="text"
+            {...register("phoneNumber", {
+              required: "Phone Number is Required",
+            })}
+            errorMessage={errors.phoneNumber?.message}
+          />
+          <div className="grid gap-2">
+            <Label id="" labelFor="">
+              Gender
+            </Label>
+
+            <Controller
+              name="gender"
+              control={control}
+              rules={{ required: "Gender is Required." }}
+              render={({ field }) => (
+                <DropdownButton
+                  items={genderItems}
+                  value={field.value}
+                  onChange={field.onChange}
+                  placeholder="Select Gender"
+                />
+              )}
+            />
+
+            {errors.gender?.message && <span>{errors.gender?.message}</span>}
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <div className="grid gap-2">
+              <Label id="" labelFor="">
+                Country
+              </Label>
+
+              <Controller
+                name="country"
+                control={control}
+                rules={{ required: "Country is Required." }}
+                render={({ field }) => (
+                  <DropdownButton
+                    items={countryItems}
+                    value={field.value}
+                    onChange={field.onChange}
+                    placeholder="Select Country"
+                  />
+                )}
               />
-            )}
+            </div>
+            <div className="grid gap-2">
+              <Label id="" labelFor="">
+                Hobbies
+              </Label>
+              <Controller
+                name="hobbies"
+                control={control}
+                rules={{ required: "Hobbies are Required." }}
+                render={({ field }) => (
+                  <DropdownButton
+                    items={hobbiesItems}
+                    value={field.value}
+                    onChange={field.onChange}
+                    placeholder="Select Hobbies"
+                  />
+                )}
+              />
+            </div>
+          </div>
+
+          <Input
+            id="email"
+            label="email"
+            type="email"
+            {...register("email", { required: "Email is Required" })}
+            errorMessage={errors.email?.message}
+          />
+          <Input
+            id="password"
+            label="password"
+            type="password"
+            {...register("password", { required: "Password is Required." })}
+            errorMessage={errors.password?.message}
           />
 
-          {errors.gender?.message && <span>{errors.gender?.message}</span>}
+          <Button type="submit" label="signup" className="h-11" />
         </div>
-        <div className="grid gap-2">
-          <Label id="" labelFor="">
-            Country
-          </Label>
-
-          <Controller
-            name="country"
-            control={control}
-            rules={{ required: "Country is Required." }}
-            render={({ field }) => (
-              <DropdownButton
-                items={countryItems}
-                value={field.value}
-                onChange={field.onChange}
-                placeholder="Select Country"
-
-              />
-            )}
-          />
-        </div>
-        <div className="grid gap-2">
-          <Label id="" labelFor="">
-            Hobbies
-          </Label>
-          <Controller
-            name="hobbies"
-            control={control}
-            rules={{ required: "Hobbies are Required." }}
-            render={({ field }) => (
-              <DropdownButton
-                items={hobbiesItems}
-                value={field.value}
-                onChange={field.onChange}
-                placeholder="Select Hobbies"
-              />
-            )}
-          />
-        </div>
-
-        <Input
-          id="email"
-          label="email"
-          type="email"
-          {...register("email", { required: "Email is Required" })}
-          errorMessage={errors.email?.message}
+      </form>
+      <div className="flex justify-center items-center gap-2">
+        <span>Already have an Account</span>
+        <Button
+          type="submit"
+          label="Login"
+          className="border-0 bg-transparent hover:bg-transparent !text-blue-800 underline"
         />
-        <Input
-          id="password"
-          label="password"
-          type="password"
-          {...register("password", { required: "Password is Required." })}
-          errorMessage={errors.password?.message}
-        />
-        <Button type="submit" label="signup" />
       </div>
-    </form>
+    </div>
   );
 };
 
