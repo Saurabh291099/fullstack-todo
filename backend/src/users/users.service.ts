@@ -3,8 +3,7 @@ import { Repository } from 'typeorm';
 import { SignUp } from '../auth/auth.entity'; // User entity
 import { InjectRepository } from '@nestjs/typeorm';
 import { SignupDto } from '../auth/dto/signUp.dto';
-import * as bcrypt from 'bcryptjs';
-
+import { UserDto } from './user.dto';
 @Injectable()
 export class UsersService {
   constructor(
@@ -13,41 +12,53 @@ export class UsersService {
   ) {}
 
   // Create user (used by AuthService)
-  async create(dto: SignupDto): Promise<SignUp> {
+  async create(dto: SignupDto): Promise<UserDto> {
     const user = this.userRepository.create(dto);
-    return this.userRepository.save(user);
+    const savedUser = await this.userRepository.save(user);
+    const { password, ...result } = savedUser;
+     return result;
   }
 
   // Find all users
-  async findAll(): Promise<SignUp[]> {
-    return this.userRepository.find();
-  }
+ async findAll(): Promise<UserDto[]> {
+  const users = await this.userRepository.find();
+  return users.map(({ password, ...user }) => user); 
+}
 
   // Find user by ID
-  async findById(id: string): Promise<SignUp> {
-    const user = await this.userRepository.findOne({ where: { id } });
-    if (!user) throw new NotFoundException(`User with ID ${id} not found`);
-    return user;
-  }
+  async findById(id: string): Promise<UserDto> {
+  const user = await this.userRepository.findOne({ where: { id } });
+  if (!user) throw new NotFoundException(`User with ID ${id} not found`);
+  const { password, ...result } = user;
+  return result;
+}
+
 
   // Find user by email
-  async findByEmail(email: string): Promise<SignUp | null> {
-    return this.userRepository.findOne({ where: { email } });
-  }
+  async findByEmail(email: string): Promise<UserDto | null> {
+  const user = await this.userRepository.findOne({ where: { email } });
+  if (!user) return null;
+  const { password, ...result } = user;
+  return result;
+}
 
   // Update user profile
-  async update(id: string, updateData: Partial<SignUp>): Promise<SignUp> {
-    const user = await this.findById(id);
-    Object.assign(user, updateData);
-    return this.userRepository.save(user);
-  }
+  async update(id: string, updateData: Partial<UserDto>): Promise<UserDto> {
+  const user = await this.userRepository.findOne({ where: { id } });
+  if (!user) throw new NotFoundException(`User with ID ${id} not found`);
+
+  Object.assign(user, updateData); // merge updates
+  const updated = await this.userRepository.save(user);
+  const { password, ...result } = updated;
+  return result;
+}
 
   // Delete user
+ async remove(id: string): Promise<void> {
+  const user = await this.userRepository.findOne({ where: { id } });
+  if (!user) throw new NotFoundException(`User with ID ${id} not found`);
 
-  async remove(id: string): Promise<void> {
-    const user = await this.findById(id);
-    await this.userRepository.remove(user);
-  }
+  await this.userRepository.remove(user);
+}
 
-  
 }
