@@ -10,7 +10,7 @@ import {
 } from "@/lib/todo-api";
 import { useForm, SubmitHandler } from "react-hook-form";
 
-const TODOS_PER_PAGE = 5;
+const TODOS_PER_PAGE = 4;
 
 const TodoPage = () => {
   const [todos, setTodos] = useState<TodoFormData[]>([]);
@@ -84,6 +84,7 @@ const TodoPage = () => {
     }
   };
 
+
   const handleDelete = async (id: number) => {
     try {
       await deleteTodo(id);
@@ -120,7 +121,7 @@ const TodoPage = () => {
       <Todo
         handleSubmit={handleSubmit(onSubmit)}
         register={register}
-        todos={todos}
+        // todos={todos}
         errorMessage={errors.name?.message || ""}
         editingId={editingId}
         currentTodos={currentTodos}
