@@ -1,25 +1,42 @@
-import { Controller, Get, Post, Put, Delete, Body, Param } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Body,
+  Param,
+  Req,
+  UseGuards
+} from '@nestjs/common';
 import { TodoService } from './todo.service';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
-
-@Controller('todos') 
+import { AuthGuard } from '@nestjs/passport';
+@Controller('todos')
 export class TodoController {
   constructor(private readonly todoService: TodoService) {}
+@UseGuards(AuthGuard('jwt'))
+  @Post()
+  create(@Body() createTodoDto: CreateTodoDto, @Req() req) {
+    const userId = req.user.id;
+    return this.todoService.create(createTodoDto, userId);
+  }
 
   @Get()
-  findAll() {
-    return this.todoService.findAll();
+  async findUserTodos(@Req() req) {
+    const userId = req.userId;
+    return this.todoService.findByUser(userId);
   }
+
+  // @Get()
+  // findAll() {
+  //   return this.todoService.findAll();
+  // }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.todoService.findOne(+id);
-  }
-
-  @Post()
-  create(@Body() dto: CreateTodoDto) {
-    return this.todoService.create(dto);
   }
 
   @Put(':id')

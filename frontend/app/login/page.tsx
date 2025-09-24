@@ -15,7 +15,7 @@ const LoginPage = () => {
         localStorage.setItem("userId", payload.sub);
         router.push("/todo");
       }else{
-        console.log("Invalid email or password")
+        alert("Invalid email or password")
       }
     } catch (error) {
       console.log("facing error while login:", error);

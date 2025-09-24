@@ -19,17 +19,42 @@ const authHeader = ()=>({
 })
 
 // here i am creating todo
-export const createTodo = async (todo: Omit<TodoFormData, "id">): Promise<TodoFormData> => {
-  const res = await api.post("/todos", todo, authHeader());
-  return res.data;
+// export const createTodo = async (todo: Omit<TodoFormData, "id">): Promise<TodoFormData> => {
+//   const res = await api.post("/todos", todo, authHeader());
+//   return res.data;
+// };
+
+
+// Create a new todo
+export const createTodo = async (todo: Omit<TodoFormData, "id">) => {
+  const token = localStorage.getItem('token');
+  if (!token) throw new Error("User not authenticated");
+  const response = await api.post("/todos", todo, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
 };
+
+// Get all todos for logged-in user
+export const getUserTodos = async () => {
+  const token = localStorage.getItem("token");
+  const response = await api.get("/todos", {  // ✅ GET request
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
+};
+
 
 // here i am creating todo for a specific user
 
-export const getUserTodos = async (userId: string): Promise<TodoFormData[]> => {
-  const res = await api.get(`/todos?userId=${userId}`);
-  return res.data;
-};
+// export const getUserTodos = async (userId: string): Promise<TodoFormData[]> => {
+//   const res = await api.get(`/todos?userId=${userId}`);
+//   return res.data;
+// };
 // Here i am getting all the Todos from db
 
 export const getAllTodos = async (): Promise<TodoFormData[]> => {

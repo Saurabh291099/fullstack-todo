@@ -14,4 +14,7 @@ export class Todo {
 
   @Column()
   completed: boolean;
+
+  @Column({nullable:true})
+  userId: string;
 }

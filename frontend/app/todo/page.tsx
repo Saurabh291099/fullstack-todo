@@ -11,13 +11,13 @@ import {
 import { useForm, SubmitHandler } from "react-hook-form";
 import Button from "../components/Button";
 import axios from "axios";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 import { useRouter } from "next/navigation";
 
 interface JwtPayload {
   sub: string;
   email: string;
-  name: string; 
+  name: string;
   iat: number;
   exp: number;
 }
@@ -28,7 +28,7 @@ const TodoPage = () => {
   const [todos, setTodos] = useState<TodoFormData[]>([]);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [loading, setLoading] = useState(true);
+  // const [loading, setLoading] = useState(true);
   const {
     register,
     handleSubmit,
@@ -39,60 +39,45 @@ const TodoPage = () => {
 
   const router = useRouter();
   const [userName, setUserName] = useState("");
-
+  const [loggedInUserId, setLoggedInUserId] = useState<string | null>(null);
   useEffect(() => {
-    const token = localStorage.getItem("token"); // 👈 get token from login
+    const token = localStorage.getItem("token");
     if (token) {
       const decoded: JwtPayload = jwtDecode(token);
-      setUserName(decoded.name); // 👈 extract name
+      setUserName(decoded.name);
+      setLoggedInUserId(decoded.sub);
     }
   }, []);
 
   // fetching API here
   useEffect(() => {
-    (async () => {
+    const fetchTodos = async () => {
       try {
-        // const data: TodoFormData[] = await getTodo(1);
-        const userId = localStorage.getItem("userId");
-        if (!userId) return;
-
-        const data: TodoFormData[] = await getUserTodos(userId);
-
-        const normalized: TodoFormData[] = data.map((t) => ({
-          ...t,
-          id: t.id,
-          name: t.name,
-          description: t.description || "",
-          time: t.time ?? new Date().toISOString(),
-          completed: t.completed ?? false,
-        }));
-
-        setTodos(normalized);
+        const data: TodoFormData[] = await getUserTodos();
+        setTodos(data);
       } catch (err) {
-        console.error("Error fetching todos:", err);
-      } finally {
-        setLoading(false);
+        console.error("Error fetching todos", err);
       }
-    })();
+    };
+    fetchTodos();
   }, []);
+
 
   // Create or update todo
 
   const onSubmit: SubmitHandler<TodoFormData> = async (data) => {
-    const userId = localStorage.getItem("userId");
-    if (!userId) {
-      console.error("User not logged in.");
-      return;
-    }
-
     try {
       if (editingId !== null) {
         const updated = await updateTodo(editingId, { ...data }); // backend adds userId
         setTodos(todos.map((todo) => (todo.id === editingId ? updated : todo)));
         setEditingId(null);
       } else {
-        const newTodo = await createTodo({ ...data }); // backend adds userId
-        setTodos([newTodo, ...todos]);
+        const newTodo = await createTodo({
+          ...data,
+          time: new Date().toISOString(),
+          completed: false,
+        }); // backend adds userId
+        setTodos((prev) => [newTodo, ...prev]);
       }
       reset();
       setCurrentPage(1);
@@ -146,16 +131,19 @@ const TodoPage = () => {
   };
 
   // Pagination logic
-  const totalPages = Math.ceil(todos.length / TODOS_PER_PAGE);
+  const userTodos = todos.filter(todo => String(todo.userId) === String(loggedInUserId));
+  const totalPages = Math.ceil(userTodos.length / TODOS_PER_PAGE);
   const startIndex = (currentPage - 1) * TODOS_PER_PAGE;
-  const currentTodos = todos.slice(startIndex, startIndex + TODOS_PER_PAGE);
+  const currentTodos = userTodos.slice(startIndex, startIndex + TODOS_PER_PAGE);
 
   const goToPage = (page: number) => {
     if (page < 1 || page > totalPages) return;
     setCurrentPage(page);
   };
 
-  if (loading) return <p>Loading todos...</p>;
+  // if (loading) return <p>Loading todos...</p>;
+
+  // handling Logout here
 
   const handleLogOut = async () => {
     try {
@@ -190,7 +178,6 @@ const TodoPage = () => {
   return (
     <div className="w-full h-[100vh] bg-white grid place-content-center place-items-center">
       <div className="flex justify-between items-center w-full pb-2">
-
         <h1 className="capitalize text-2xl">Welcome, {userName} 👋</h1>
         <Button
           type="button"
