@@ -9,6 +9,10 @@ import {
   getUserTodos,
 } from "@/lib/todo-api";
 import { useForm, SubmitHandler } from "react-hook-form";
+import Button from "../components/Button";
+import axios from "axios";
+
+import { useRouter } from "next/navigation";
 
 const TODOS_PER_PAGE = 4;
 
@@ -24,8 +28,11 @@ const TodoPage = () => {
     setValue,
     formState: { errors },
   } = useForm<TodoFormData>();
+  
+  const router = useRouter();
+  
+  
   // fetching API here
-
   useEffect(() => {
     (async () => {
       try {
@@ -54,32 +61,6 @@ const TodoPage = () => {
   }, []);
 
   // Create or update todo
-  // const onSubmit: SubmitHandler<TodoFormData> = async (data) => {
-  //   const userId = localStorage.getItem("userId");
-  //   if (!userId) {
-  //     console.error("User not logged in.");
-  //     return;
-  //   }
-  //   if (editingId !== null) {
-  //     try {
-  //       const updated = await updateTodo(editingId, { ...data, userId });
-  //       setTodos(todos.map((todo) => (todo.id === editingId ? updated : todo)));
-  //       setEditingId(null);
-  //     } catch (error) {
-  //       console.log("Error updating Todo:", error);
-  //     }
-  //   } else {
-  //     try {
-  //       const newTodo = await createTodo({ ...data, userId });
-  //       setTodos([newTodo, ...todos]); // prepend new todo
-  //     } catch (error) {
-  //       console.log("Error Creating Todo:", error);
-  //     }
-  //   }
-  //   reset();
-  //   setCurrentPage(1);
-  //   console.log("Todo Data:", data);
-  // };
 
   const onSubmit: SubmitHandler<TodoFormData> = async (data) => {
     const userId = localStorage.getItem("userId");
@@ -139,7 +120,7 @@ const TodoPage = () => {
     }
   };
 
-  // Start editing
+  // Edit todo
   const editTodo = (todo: TodoType) => {
     setEditingId(todo.id);
     setValue("name", todo.name);
@@ -160,12 +141,58 @@ const TodoPage = () => {
 
   if (loading) return <p>Loading todos...</p>;
 
+
+  const handleLogOut = async () => {
+    try {
+      const userId = localStorage.getItem("userId");
+      if (!userId) throw new Error("User not logged in");
+
+      // Sending userId in body
+      const response = await axios.post(
+        "http://localhost:4000/auth/logout",
+        { userId: Number(userId) },
+        { headers: { "Content-Type": "application/json" } }
+      );
+
+      localStorage.removeItem("token");
+      localStorage.removeItem("userId");
+      localStorage.removeItem("refreshToken");
+
+      console.log("Logged out successfully:", response.data);
+      return response.data;
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        console.error("Logout failed:", error.response?.data || error.message);
+      } else if (error instanceof Error) {
+        console.error("Logout failed:", error.message);
+      } else {
+        console.error("Logout failed:", error);
+      }
+      throw error;
+    }
+  };
+
   return (
     <div className="w-full h-[100vh] bg-white grid place-content-center place-items-center">
+      <div className="flex justify-end w-full">
+        <Button
+          type="button"
+          label="Logout"
+          onClick={async () => {
+            try {
+              await handleLogOut();
+              alert("Logged out successfully");
+              router.push("/login");
+            } catch {
+              alert("Logout failed");
+            }
+          }}
+        ></Button>
+      </div>
+
       <Todo
         handleSubmit={handleSubmit(onSubmit)}
         register={register}
-        // todos={todos}
         errorMessage={errors.name?.message || ""}
         editingId={editingId}
         currentTodos={currentTodos}

@@ -12,7 +12,7 @@ const LoginPage = () => {
         localStorage.setItem("token", user.access_token);
 
         const payload = JSON.parse(atob(user.access_token.split('.')[1]))
-        localStorage.setItem("userId", payload);
+        localStorage.setItem("userId", payload.sub);
         router.push("/todo");
       }else{
         console.log("Invalid email or password")

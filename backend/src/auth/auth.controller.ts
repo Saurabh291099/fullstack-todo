@@ -7,11 +7,13 @@ import {
   ValidationPipe,
   UseGuards,
   Req,
+  BadRequestException,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignupDto } from './dto/signUp.dto';
 import { LoginDto } from './dto/login.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { UserDto } from 'src/users/user.dto';
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
@@ -37,11 +39,13 @@ export class AuthController {
     return this.authService.refreshToken(refreshToken);
   }
 
-
   @Post('logout')
-  @UseGuards(JwtAuthGuard)
-  async logout(@Req() req) {
-    return this.authService.logout(req.user.userId);
+  async logout(@Body('userId') userId: string) {
+    if (!userId) {
+      throw new BadRequestException('userId is required');
+    }
+
+    return this.authService.logout(userId);
   }
 
   // ✅ Reset password route
