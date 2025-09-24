@@ -11,8 +11,16 @@ import {
 import { useForm, SubmitHandler } from "react-hook-form";
 import Button from "../components/Button";
 import axios from "axios";
-
+import {jwtDecode} from "jwt-decode";
 import { useRouter } from "next/navigation";
+
+interface JwtPayload {
+  sub: string;
+  email: string;
+  name: string; 
+  iat: number;
+  exp: number;
+}
 
 const TODOS_PER_PAGE = 4;
 
@@ -28,10 +36,18 @@ const TodoPage = () => {
     setValue,
     formState: { errors },
   } = useForm<TodoFormData>();
-  
+
   const router = useRouter();
-  
-  
+  const [userName, setUserName] = useState("");
+
+  useEffect(() => {
+    const token = localStorage.getItem("token"); // 👈 get token from login
+    if (token) {
+      const decoded: JwtPayload = jwtDecode(token);
+      setUserName(decoded.name); // 👈 extract name
+    }
+  }, []);
+
   // fetching API here
   useEffect(() => {
     (async () => {
@@ -141,7 +157,6 @@ const TodoPage = () => {
 
   if (loading) return <p>Loading todos...</p>;
 
-
   const handleLogOut = async () => {
     try {
       const userId = localStorage.getItem("userId");
@@ -174,7 +189,9 @@ const TodoPage = () => {
 
   return (
     <div className="w-full h-[100vh] bg-white grid place-content-center place-items-center">
-      <div className="flex justify-end w-full pb-2">
+      <div className="flex justify-between items-center w-full pb-2">
+
+        <h1 className="capitalize text-2xl">Welcome, {userName} 👋</h1>
         <Button
           type="button"
           label="Logout"

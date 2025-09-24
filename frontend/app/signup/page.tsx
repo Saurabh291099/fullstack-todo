@@ -33,6 +33,7 @@ const SignUpPage = () => {
       await handleSignUp(data);
       form.reset();
       router.push("/login");
+      console.log("signupData", data)
     } catch (err) {
       console.error("Signup failed", err);
     }

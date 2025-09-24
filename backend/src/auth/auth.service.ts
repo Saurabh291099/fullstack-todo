@@ -64,7 +64,6 @@ export class AuthService {
   async login(dto: LoginDto) {
     const { email, password } = dto;
 
-    // my is first step is to find the user
 
     const user = await this.findByEmail(email);
     if (!user) {
@@ -77,7 +76,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid Credentials');
     }
     // here i am generating jwt token
-    const payload = { sub: user.id, email: user.email };
+    const payload = { sub: user.id, email: user.email, name: user.name };
     const access_token = this.jwtService.sign(payload, { expiresIn: '15m' });
     const refresh_token = this.jwtService.sign(payload, { expiresIn: '7d' });
 
