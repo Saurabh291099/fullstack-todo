@@ -1,16 +1,22 @@
 "use client";
 import Input from "../components/Input";
 import Button from "../components/Button";
-import { MenuProps } from "antd";
 import DropdownButton from "../components/Dropdown";
 import Label from "../components/Label";
-import { Controller, useForm } from "react-hook-form";
+import { Controller } from "react-hook-form";
+import { UseFormReturn } from "react-hook-form";
+import { MenuProps } from "antd";
 
 interface SignupProps {
-  onSubmit: () => void;
+  onSubmit: (data: SignUpFormInputs) => void;
+  hobbiesItems: MenuProps["items"];
+  genderItems: MenuProps["items"];
+  countryItems: MenuProps["items"];
+  form: UseFormReturn<SignUpFormInputs>;
+  handleLoginBtn:()=> void;
 }
 
-type SignUpFormInputs = {
+export type SignUpFormInputs = {
   name: string;
   phoneNumber: string;
   gender: string;
@@ -19,40 +25,20 @@ type SignUpFormInputs = {
   email: string;
   password: string;
 };
-const SignUp: React.FC<SignupProps> = ({}) => {
-  const genderItems: MenuProps["items"] = [
-    { label: "Male", key: "male" },
-    { label: "Female", key: "female" },
-  ];
-
-  const countryItems: MenuProps["items"] = [
-    { label: "India", key: "india" },
-    { label: "USA", key: "usa" },
-    { label: "China", key: "china" },
-    { label: "Russia", key: "russia" },
-  ];
-
-  const hobbiesItems: MenuProps["items"] = [
-    { label: "Cricket", key: "cricket" },
-    { label: "Football", key: "football" },
-    { label: "Hockey", key: "hockey" },
-    { label: "chess", key: "chess" },
-  ];
-
+const SignUp: React.FC<SignupProps> = ({
+  form,
+  hobbiesItems,
+  genderItems,
+  countryItems,
+  onSubmit,
+  handleLoginBtn
+}) => {
   const {
     register,
     handleSubmit,
     control,
     formState: { errors },
-  } = useForm<SignUpFormInputs>();
-
-  const onSubmit = (data: SignUpFormInputs) => {
-    console.log("Form Submitted with data", data);
-  };
-
-  // const handleMenuClick: MenuProps["onClick"] = (e) => {
-  //   alert(`click: ${e.key}`);
-  // };
+  } = form;
 
   return (
     <div className=" grid place-content-center p-8 rounded-xl gap-2 bg-white shadow-2xl ">
@@ -159,8 +145,9 @@ const SignUp: React.FC<SignupProps> = ({}) => {
       <div className="flex justify-center items-center gap-2">
         <span>Already have an Account</span>
         <Button
-          type="submit"
+          type="button"
           label="Login"
+          onClick={handleLoginBtn}
           className="border-0 bg-transparent hover:bg-transparent !text-blue-800 underline"
         />
       </div>

@@ -2,11 +2,11 @@
 import Todo, { TodoType } from "../templates/Todo";
 import { useEffect, useState } from "react";
 import {
-  getTodo,
   createTodo,
   updateTodo,
   deleteTodo,
   TodoFormData,
+  getUserTodos,
 } from "@/lib/todo-api";
 import { useForm, SubmitHandler } from "react-hook-form";
 
@@ -16,7 +16,7 @@ const TodoPage = () => {
   const [todos, setTodos] = useState<TodoFormData[]>([]);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
-
+  const [loading, setLoading] = useState(true);
   const {
     register,
     handleSubmit,
@@ -29,9 +29,14 @@ const TodoPage = () => {
   useEffect(() => {
     (async () => {
       try {
-        const data: TodoFormData[] = await getTodo(1);
+        // const data: TodoFormData[] = await getTodo(1);
+        const userId = localStorage.getItem("userId");
+        if (!userId) return;
+
+        const data: TodoFormData[] = await getUserTodos(userId);
 
         const normalized: TodoFormData[] = data.map((t) => ({
+          ...t,
           id: t.id,
           name: t.name,
           description: t.description || "",
@@ -42,31 +47,61 @@ const TodoPage = () => {
         setTodos(normalized);
       } catch (err) {
         console.error("Error fetching todos:", err);
+      } finally {
+        setLoading(false);
       }
     })();
   }, []);
 
+  // Create or update todo
+  // const onSubmit: SubmitHandler<TodoFormData> = async (data) => {
+  //   const userId = localStorage.getItem("userId");
+  //   if (!userId) {
+  //     console.error("User not logged in.");
+  //     return;
+  //   }
+  //   if (editingId !== null) {
+  //     try {
+  //       const updated = await updateTodo(editingId, { ...data, userId });
+  //       setTodos(todos.map((todo) => (todo.id === editingId ? updated : todo)));
+  //       setEditingId(null);
+  //     } catch (error) {
+  //       console.log("Error updating Todo:", error);
+  //     }
+  //   } else {
+  //     try {
+  //       const newTodo = await createTodo({ ...data, userId });
+  //       setTodos([newTodo, ...todos]); // prepend new todo
+  //     } catch (error) {
+  //       console.log("Error Creating Todo:", error);
+  //     }
+  //   }
+  //   reset();
+  //   setCurrentPage(1);
+  //   console.log("Todo Data:", data);
+  // };
 
   const onSubmit: SubmitHandler<TodoFormData> = async (data) => {
-    if (editingId !== null) {
-      try {
-        const updated = await updateTodo(editingId, data);
+    const userId = localStorage.getItem("userId");
+    if (!userId) {
+      console.error("User not logged in.");
+      return;
+    }
+
+    try {
+      if (editingId !== null) {
+        const updated = await updateTodo(editingId, { ...data }); // backend adds userId
         setTodos(todos.map((todo) => (todo.id === editingId ? updated : todo)));
         setEditingId(null);
-      } catch (error) {
-        console.log("Error fetching Todo:", error);
-      }
-    } else {
-      try {
-        const newTodo = await createTodo(data as Omit<TodoFormData, "id">);
+      } else {
+        const newTodo = await createTodo({ ...data }); // backend adds userId
         setTodos([newTodo, ...todos]);
-      } catch (error) {
-        console.log("Error Creating Todo:", error);
       }
+      reset();
+      setCurrentPage(1);
+    } catch (error) {
+      console.error("Error saving Todo:", error);
     }
-    reset();
-    setCurrentPage(1);
-    console.log("Todo Data:", data)
   };
 
   const toggleComplete = async (id: number) => {
@@ -84,20 +119,27 @@ const TodoPage = () => {
     }
   };
 
-
+  // Delete todo
   const handleDelete = async (id: number) => {
     try {
       await deleteTodo(id);
-      setTodos(todos.filter((todo) => todo.id !== id));
+      const remaining = todos.filter((todo) => todo.id !== id);
+      setTodos(remaining);
+
       if (editingId === id) setEditingId(null);
 
-      const lastPage = Math.ceil((todos.length - 1) / TODOS_PER_PAGE);
+      // Adjust page if needed
+      const lastPage = Math.max(
+        1,
+        Math.ceil(remaining.length / TODOS_PER_PAGE)
+      );
       if (currentPage > lastPage) setCurrentPage(lastPage);
     } catch (error) {
       console.log("Error deleting todo:", error);
     }
   };
 
+  // Start editing
   const editTodo = (todo: TodoType) => {
     setEditingId(todo.id);
     setValue("name", todo.name);
@@ -115,6 +157,8 @@ const TodoPage = () => {
     if (page < 1 || page > totalPages) return;
     setCurrentPage(page);
   };
+
+  if (loading) return <p>Loading todos...</p>;
 
   return (
     <div className="w-full h-[100vh] bg-white grid place-content-center place-items-center">

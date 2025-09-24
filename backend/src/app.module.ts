@@ -11,6 +11,7 @@ import { SignUp } from './auth/auth.entity';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { TodoModule } from './todo/todo.module';
+import { Todo } from './todo/todo.entity';
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -24,7 +25,7 @@ import { TodoModule } from './todo/todo.module';
       password: 'postgres',
       database: 'todo_db',
       autoLoadEntities: true,
-      entities: [SignUp],
+      entities: [SignUp, Todo],
       synchronize: true, // ❗ only in dev, not in prod
     }),
     AuthModule,

@@ -4,7 +4,8 @@ import Button from "../components/Button";
 import { useForm } from "react-hook-form";
 
 interface LoginProps {
-  onSubmit: () => void;
+  onSubmit: (data: LoginFormInputs) => void;
+  handleSignUpBtn:()=> void;
 }
 
 type LoginFormInputs = {
@@ -16,16 +17,13 @@ type LoginFormInputs = {
   email: string;
   password: string;
 };
-const Login: React.FC<LoginProps> = ({}) => {
+const Login: React.FC<LoginProps> = ({handleSignUpBtn, onSubmit}) => {
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<LoginFormInputs>();
 
-  const onSubmit = (data: LoginFormInputs) => {
-    console.log("Form Submitted with data", data);
-  };
 
   return (
     <div className="grid place-content-center p-10 rounded-xl gap-4 bg-white shadow-2xl">
@@ -53,8 +51,9 @@ const Login: React.FC<LoginProps> = ({}) => {
       <div className="flex justify-center items-center gap-1">
         <span>Do not have an Account</span>
         <Button
-          type="submit"
+          type="button"
           label="signup"
+          onClick={handleSignUpBtn}
           className="border-0 bg-transparent hover:bg-transparent !text-blue-800 underline"
         />
       </div>

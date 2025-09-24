@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
 @Entity()
-export class SignUp {
+export class User {
   // If id is UUID
   @PrimaryGeneratedColumn('uuid')
   id: string;

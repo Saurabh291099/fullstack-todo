@@ -48,23 +48,12 @@ const Todo: React.FC<TodoItem> = ({
   goToPage,
 }) => {
   return (
-    <div className="border border-[#c5c5c7] w-[60rem] h-[65vh] bg-gray-100 flex flex-col items-center p-10 rounded-xl">
-      {/* <div
-        className={`${
-          todos.length === 1 ? "flex justify-between items-center" : ""
-        }`}
-      >
-        
-        {todos.length === 1 ? (
-          <Button type="button" label="Add New Todo" />
-        ) : (
-          ""
-        )}
-      </div> */}
+    <div className="border border-[#c5c5c7] w-[60rem] h-[70vh] bg-gray-100 flex flex-col items-center p-10 rounded-xl">
+    
 
       <h1 className="text-3xl font-bold mb-4">Todo App</h1>
 
-      <div className="grid grid-cols-2 gap-4 w-full">
+      <div className="grid grid-cols-2 gap-4 w-full h-full">
         {/* Todo Input Form */}
         <form onSubmit={handleSubmit} className="flex flex-col w-full gap-2">
           <Input
@@ -106,7 +95,7 @@ const Todo: React.FC<TodoItem> = ({
           />
         </form>
 
-        <div className="flex flex-col justify-between h-[25rem] border-l pl-4 border-[#c5c5c7]">
+        <div className="flex flex-col justify-between h-full border-l pl-4 border-[#c5c5c7]">
           {/* Todo List */}
           <ul className="w-full max-w-md">
             {currentTodos.length === 0 && (
