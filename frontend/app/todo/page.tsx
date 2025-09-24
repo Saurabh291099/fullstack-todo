@@ -174,7 +174,7 @@ const TodoPage = () => {
 
   return (
     <div className="w-full h-[100vh] bg-white grid place-content-center place-items-center">
-      <div className="flex justify-end w-full">
+      <div className="flex justify-end w-full pb-2">
         <Button
           type="button"
           label="Logout"

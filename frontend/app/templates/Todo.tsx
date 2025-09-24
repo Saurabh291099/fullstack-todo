@@ -49,9 +49,9 @@ const Todo: React.FC<TodoItem> = ({
 }) => {
   return (
     <div className="border border-[#c5c5c7] w-[60rem] h-[70vh] bg-gray-100 flex flex-col items-center p-10 rounded-xl">
-    
-
-      <h1 className="text-3xl font-bold mb-4">Todo App</h1>
+      <div className="text-4xl text-center pb-2 w-full border-b  border-[#c5c5c7] font-bold mb-4">
+        <h1>Todo App</h1>
+      </div>
 
       <div className="grid grid-cols-2 gap-4 w-full h-full">
         {/* Todo Input Form */}
@@ -113,7 +113,7 @@ const Todo: React.FC<TodoItem> = ({
                   onClick={() => toggleComplete(todo.id)}
                 >
                   <div className="grid grid-cols-3 text-ellipsis text-center">
-                      <p className="font-bold text-start">{todo.name}</p>
+                    <p className="font-bold text-start">{todo.name}</p>
                     <p className="text-xs text-gray-500">
                       {todo.completed ? "Completed" : "In Progress"}
                     </p>
@@ -133,7 +133,7 @@ const Todo: React.FC<TodoItem> = ({
                     onClick={() => deleteTodo(todo.id)}
                     className="text-red-500 hover:text-red-700 font-bold hover:cursor-pointer"
                   >
-                   Delete X
+                    Delete X
                   </button>
                 </div>
               </li>
@@ -142,10 +142,10 @@ const Todo: React.FC<TodoItem> = ({
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex gap-2 mt-4">
+            <div className="flex w-full justify-center gap-2 mt-4">
               <Button
                 type="button"
-                label="Prev"
+                label="<"
                 className="px-3 py-1"
                 onClick={() => goToPage(currentPage - 1)}
               />
@@ -164,7 +164,7 @@ const Todo: React.FC<TodoItem> = ({
               ))}
               <Button
                 type="button"
-                label="Next"
+                label=">"
                 className="px-3 py-1"
                 onClick={() => goToPage(currentPage + 1)}
               />
